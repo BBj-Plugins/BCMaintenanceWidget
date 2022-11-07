@@ -1,0 +1,55 @@
+use com.basiscomponents.db.ResultSet
+use com.basiscomponents.db.DataRow
+
+class public Util
+
+    method public static void buildError(Object errors!, BBjString message!, BBjString multipleMessage!)
+        declare BBjVector errVec!
+        declare ResultSet errRs!
+
+        errRs! = cast(ResultSet,errors!,err=*next)
+        if (errRs! <> null()) then 
+            #buildErrorFromRS(errRs!,message!,multipleMessage!)
+        endif
+
+        errVec! = cast(BBjVector,errors!,err=*next)
+        if (errVec! <> null()) then 
+            #buildErrorFromVector(errRs!,message!,multipleMessage!)
+        endif
+    methodend
+
+    method public static void buildErrorFromRS(ResultSet errorRs!, BBjString message!, BBjString multipleMessage!)
+        if (!errorRs!.isEmpty()) then 
+            if errorRs!.size() > 1 then
+                message! = multipleMessage!
+            endif
+        
+            for i = 0 to errorRs!.size() -1 
+                dr! = errorRs!.get(i)
+                if(dr!.contains("MESSAGE")) then 
+                    error! = dr!.getFieldAsString("MESSAGE")
+                else
+                    error! = dr!.getFieldAsString("error")
+                endif
+
+                message! = message! + $0a$ + error! 
+            next i
+            a = msgbox(message!,1,"Error")
+            methodret 
+        endif
+    methodend
+
+    method public static void buildErrorFromVector(BBjVector errors!, BBjString message!, BBjString multipleMessage!)
+        escape
+    methodend
+
+    method public static DataRow removeFields(DataRow row!, BBjVector fields!)
+        if(row! = null() or row!.isEmpty()) then methodret row!
+        if(fields! = null() or fields!.isEmpty()) then methodret row!
+
+        for i = 0 to fields!.size() -1 
+            row!.removeField(str(fields!.get(i)),err=*next)
+        next i
+        methodret row!
+    methodend
+classend

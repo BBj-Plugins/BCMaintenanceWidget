@@ -1,0 +1,78 @@
+use com.basiscomponents.db.ResultSet
+use com.basiscomponents.db.DataRow
+use com.basiscomponents.db.DataField
+use com.basiscomponents.bc.BusinessComponent
+
+use com.google.gson.JsonArray
+
+use java.util.UUID
+use java.util.Map
+
+use ::BBjGridExWidget/GxCellEditors.bbj::GxCellEditorSuggestion
+use ::lib/LookupResolver.bbj::LookupResolver
+
+class public BCLookupHelper 
+
+    field private BusinessComponent bc!
+
+    method public BCLookupHelper(BusinessComponent bc!)
+        #bc! = bc!
+    methodend
+    
+    rem /**
+    rem  * Build the SuggestionCellEditor for the LookupBC
+    rem  * If the Lookup BC has the field %SEARCH then we pass it as filter to BC
+    rem  * The BC either uses the lucene or implements a sql search with like
+    rem  * The Suggestions are build with primaryKey - label if a label can be found
+    rem  * If none of the Fields have the attribute LABEL then we default to DESC and if
+    rem  * the DataRow does not contain the Desc field the Suggestions are just the primaryKeys
+    rem  * If no primaryKey is found an Exception is thrown
+    rem  */ 
+    method public GxCellEditorSuggestion buildSuggestions()
+        declare GxCellEditorSuggestion suggestionEditor!
+        declare BBjNumber useSearch!
+        declare BBjString resolverKey!
+        declare BBjString resolverLabel!
+        declare DataRow columnDefinitions!
+
+        useSearch! = 0
+        resolverLabel! = "DESC"
+        columnDefinitions! = #bc!.getAttributesRecord()
+
+        for i = 0 to columnDefinitions!.getColumnCount() -1
+            declare auto BBjString label!
+            declare Map attr!        
+            declare BBjString cname!
+            declare DataField field!
+
+            cname! = columnDefinitions!.getColumnName(i) 
+            field! = columnDefinitions!.getField(cname!)
+            attr! = field!.getAttributes()
+
+            if(cname! = "%SEARCH") then useSearch! = 1
+            
+            rem if label is set in the attr it means that this column is the label for the lookup
+            label! = attr!.get("LABEL")
+            if(label! <> null()) then resolverLabel! = cname!
+
+            editable! = attr!.get("EDITABLE")
+            if (editable! = null()) then editable! = "0"
+
+            if(num(editable!) <> 2 ) then continue 
+            resolverKey! = cname!
+        next i
+
+        if(resolverKey! = null()) then 
+            throw "No Primary key found in " + #bc!.toString(), 404
+        endif
+
+        uniqueID! = UUID.randomUUID().toString()
+        resolver! = new LookupResolver(#bc!,resolverKey!,resolverLabel!,useSearch!)
+        suggestionEditor! = new GxCellEditorSuggestion(uniqueID!, resolver!)
+        suggestionEditor!.setEmptyMessage("No match found")
+        suggestionEditor!.setShowOnFocus(1)
+        suggestionEditor!.setMinLength(1)
+        suggestionEditor!.setRequired(1)
+        methodret suggestionEditor!
+    methodend
+classend

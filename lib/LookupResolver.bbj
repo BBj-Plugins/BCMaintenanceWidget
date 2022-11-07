@@ -1,0 +1,61 @@
+use ::BBjGridExWidget/GxCellEditors.bbj::GxCellEditorSuggestionResolver
+
+use com.basiscomponents.bc.BusinessComponent
+use com.basiscomponents.db.DataRow
+
+class public LookupResolver extends GxCellEditorSuggestionResolver
+
+    field private BusinessComponent bc!
+    field private BBjString primaryKey!
+    field private BBjString label!
+    field private BBjNumber useSearch!
+
+    method public LookupResolver(BusinessComponent bc!, BBjString primaryKey!, BBjString label!, BBjNumber useSearch!)
+        #bc! = bc!
+        #primaryKey! = primaryKey!
+        #label! = label!
+        #useSearch! = useSearch!
+    methodend
+
+    rem /**
+    rem  * Gets called by the Grids GxCellEditorSuggestion 
+    rem  * Makes a retrieves to the LookupBC and calls the #addItem()
+    rem  * if the label can be found the result is build like
+    rem  * primaryKey - label
+    rem  * if not only the primaryKey is used
+    rem  * If useSearch is false all Data will be shown and there is not a search feature
+    rem  * The value when selected will always be the primaryKey
+    rem  */
+    method public void doResolve(BBjString term!)
+        declare DataRow filter!
+        declare BBjNumber hasLabel!    
+        
+        filter! = new DataRow()
+        hasLabel! = 0
+        
+        if (#useSearch!) then
+            filter!.setFieldValue("%SEARCH",term!)
+            #bc!.setFilter(filter!)
+        endif
+
+        rs! = #bc!.retrieve(err=error)
+        if(rs! = null() or rs!.isEmpty()) then methodret
+
+        if(rs!.get(0).contains(#label!)) then hasLabel! = 1
+
+        for i = 0 to rs!.size() -1
+            dr! = rs!.get(i)
+            value! = dr!.getFieldAsString(#primaryKey!)
+            desc! = value!
+            if(hasLabel!) then
+                desc! = value! + " - " + dr!.getFieldAsString(#label!)
+            endif
+            #addItem(desc!, value!)
+        next i
+        methodret
+
+        error:
+            #addItem("Failed to query Lookup Data","")
+        methodret
+    methodend
+classend

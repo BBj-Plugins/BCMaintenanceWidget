@@ -1,0 +1,90 @@
+use ::lib/BCMaintenanceWidget.bbj::BCMaintenanceWidget
+use ::bbwindowutils.bbj::BBWindowUtils
+
+use ::sys/classes/user/AdmMnuItemBC.bbj::AdmMnuItemBC
+use ::sys/classes/SessionsBC.bbj::SessionsBC
+
+use com.basiscomponents.bc.BusinessComponent
+
+bbjHome! = System.getProperty("basis.BBjHome")
+
+barista! = bbjHome! + "/barista/ "
+prefix barista! + pfx
+
+user$ = "admin"
+password$ = "admin123"
+
+bar! = new ::sys/prog/bao_barista.bbj::Barista(1); rem with no IO
+bar!.setUserCredentials(user$, password$)
+
+rem don't need to keep the Barista object around
+bar!.destroy()
+bar! = null()
+
+sysgui! = BBjAPI().openSysGui("X0")
+wnd! = sysgui!.addWindow(0,0,800,600,"BCMaintenanceWidget")
+
+lb! = wnd!.addListButton(98755,0,0,200,400,"")
+lb!.setCallback(lb!.ON_LIST_SELECT,"onBCSelect")
+
+wnd!.setCallback(BBjAPI.ON_CLOSE,"byebye")
+wnd!.setCallback(BBjAPI.ON_RESIZE,"resize")
+
+wnd2! = wnd!.addChildWindow(wnd!.getAvailableControlID(),0,25,800,550,"",BBjAPI().getSysGui().getAvailableContext())
+path! = bbjHome! + "/apps/examples/classes/user/"
+
+gosub readfromPath
+
+declare BCMaintenanceWidget editor!
+BBWindowUtils.centerWindow(wnd!)
+editor! = new BCMaintenanceWidget(wnd2!)
+
+process_events
+
+resize:
+    ev! = BBjAPI().getLastEvent()
+    h = ev!.getHeight()
+    w = ev!.getWidth()
+    wnd2!.setSize(w,h-50)
+    editor!.getgridex().setSize(w,h-50)
+return
+
+byebye:
+    release
+
+onBCSelect:
+    ev! = BBjAPI().getLastEvent()
+    bc! = ev!.getSelectedItem()
+    seterr error
+    chdir(bbjHome! + "/barista/")
+        toEval! = "new ::" + bc! + ".bbj::" + bc! + "()"
+        bc! = eval(toEval!)
+        editor!.setBC(bc!)
+    return
+    error:
+return
+
+readfromPath:
+declare BBjClientFileSystem filesys!
+declare BBjClientFile file!
+declare BBjVector files!
+
+    seterr error
+    filesys! = BBjAPI().getThinClient().getClientFileSystem()
+    file! = filesys!.getClientFile(path!)
+    files! = file!.listFiles()
+
+    if files!.isEmpty() then 
+        a = msgbox("Please make sure your Barista is synced and you have the Examples downloaded",1,"Error")
+        return
+    endif
+
+    for i = 0 to files!.size() -1 
+        value! = str(files!.get(i))
+        value! = value!.replaceAll(path!,"")
+        value! = value!.replaceAll(".bbj","")
+        lb!.addItem(value!)
+    next i
+    return
+error:
+return

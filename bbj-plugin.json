@@ -1,0 +1,13 @@
+{
+    "name": "BCMaintenanceWidget",
+    "description": "A Widget to maintain your BusinessComponent classes",
+    "version": "0.0.1",
+    "bbj_dependency": "20.11",
+    "plugin_dependencies": [
+        {
+            "plugin_name": "BBjGridExWidget",
+            "plugin_version": "1.11.0",
+            "project_url": "https://github.com/BBj-Plugins/BBjGridExWidget"
+        }
+    ]
+}
