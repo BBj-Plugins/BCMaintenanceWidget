@@ -1,8 +1,5 @@
-use ::lib/BCMaintenanceWidget.bbj::BCMaintenanceWidget
+use ::BCMaintenanceWidget/lib/BCMaintenanceWidget.bbj::BCMaintenanceWidget
 use ::bbwindowutils.bbj::BBWindowUtils
-
-use ::sys/classes/user/AdmMnuItemBC.bbj::AdmMnuItemBC
-use ::sys/classes/SessionsBC.bbj::SessionsBC
 
 use com.basiscomponents.bc.BusinessComponent
 
@@ -55,13 +52,11 @@ byebye:
 onBCSelect:
     ev! = BBjAPI().getLastEvent()
     bc! = ev!.getSelectedItem()
-    seterr error
-    chdir(bbjHome! + "/barista/")
+
+    rem chdir(bbjHome! + "/barista/")
         toEval! = "new ::" + bc! + ".bbj::" + bc! + "()"
         bc! = eval(toEval!)
         editor!.setBC(bc!)
-    return
-    error:
 return
 
 readfromPath:
@@ -69,7 +64,6 @@ declare BBjClientFileSystem filesys!
 declare BBjClientFile file!
 declare BBjVector files!
 
-    seterr error
     filesys! = BBjAPI().getThinClient().getClientFileSystem()
     file! = filesys!.getClientFile(path!)
     files! = file!.listFiles()
@@ -86,5 +80,5 @@ declare BBjVector files!
         lb!.addItem(value!)
     next i
     return
-error:
+
 return

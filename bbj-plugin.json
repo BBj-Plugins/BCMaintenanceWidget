@@ -2,6 +2,7 @@
     "name": "BCMaintenanceWidget",
     "description": "A Widget to maintain your BusinessComponent classes",
     "version": "0.0.1",
+    "author":"BASIS Europe Distribution GmbH",
     "bbj_dependency": "20.11",
     "plugin_dependencies": [
         {

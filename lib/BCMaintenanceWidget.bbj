@@ -22,8 +22,8 @@ use ::BBjGridExWidget/GxCellEditors.bbj::GxCellEditorSelect
 
 use ::BBjWidget/BBjWidget.bbj::BBjWidget
 
-use ::lib/Util.bbj::Util
-use ::lib/BCLookupHelper.bbj::BCLookupHelper
+use ::BCMaintenanceWidget/lib/Util.bbj::Util
+use ::BCMaintenanceWidget/lib/BCLookupHelper.bbj::BCLookupHelper
 
 class public BCMaintenanceWidget extends BBjWidget
     field private BusinessComponent bc!
