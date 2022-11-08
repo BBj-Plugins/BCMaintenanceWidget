@@ -41,8 +41,8 @@ declare BCMaintenanceWidget editor!
 BBWindowUtils.centerWindow(wnd!)
 editor! = new BCMaintenanceWidget(wnd2!)
 
-lb!.selectIndex(0)
-bc! = lb!.getItemAt(0)
+lb!.selectIndex(1)
+bc! = lb!.getItemAt(1)
 gosub setBC
 
 process_events
