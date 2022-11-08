@@ -9,7 +9,7 @@ use java.util.UUID
 use java.util.Map
 
 use ::BBjGridExWidget/GxCellEditors.bbj::GxCellEditorSuggestion
-use ::lib/LookupResolver.bbj::LookupResolver
+use ::BCMaintenanceWidget/lib/LookupResolver.bbj::LookupResolver
 
 class public BCLookupHelper 
 

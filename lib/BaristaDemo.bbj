@@ -3,6 +3,8 @@ use ::bbwindowutils.bbj::BBWindowUtils
 
 use com.basiscomponents.bc.BusinessComponent
 
+? 'HIDE'
+
 bbjHome! = System.getProperty("basis.BBjHome")
 
 barista! = bbjHome! + "/barista/ "
@@ -53,7 +55,7 @@ onBCSelect:
     ev! = BBjAPI().getLastEvent()
     bc! = ev!.getSelectedItem()
 
-    rem chdir(bbjHome! + "/barista/")
+    chdir(bbjHome! + "/barista/")
         toEval! = "new ::" + bc! + ".bbj::" + bc! + "()"
         bc! = eval(toEval!)
         editor!.setBC(bc!)
