@@ -20,16 +20,19 @@ rem don't need to keep the Barista object around
 bar!.destroy()
 bar! = null()
 
-sysgui! = BBjAPI().openSysGui("X0")
-wnd! = sysgui!.addWindow(0,0,800,600,"BCMaintenanceWidget")
 
-lb! = wnd!.addListButton(98755,0,0,200,400,"")
+sysgui! = BBjAPI().openSysGui("X0")
+wnd! = sysgui!.addWindow(0,0,1400,800,"BCMaintenanceWidget Demo")
+
+lb! = wnd!.addListButton(wnd!.getAvailableControlID(),65,0,200,400,"")
 lb!.setCallback(lb!.ON_LIST_SELECT,"onBCSelect")
+
+text! = wnd!.addStaticText(wnd!.getAvailableControlID(),5,5,60,25,"BC wählen")
 
 wnd!.setCallback(BBjAPI.ON_CLOSE,"byebye")
 wnd!.setCallback(BBjAPI.ON_RESIZE,"resize")
 
-wnd2! = wnd!.addChildWindow(wnd!.getAvailableControlID(),0,25,800,550,"",BBjAPI().getSysGui().getAvailableContext())
+wnd2! = wnd!.addChildWindow(wnd!.getAvailableControlID(),0,25,1400,775,"",$00000800$,BBjAPI().getSysGui().getAvailableContext())
 path! = bbjHome! + "/apps/examples/classes/user/"
 
 gosub readfromPath
@@ -38,27 +41,23 @@ declare BCMaintenanceWidget editor!
 BBWindowUtils.centerWindow(wnd!)
 editor! = new BCMaintenanceWidget(wnd2!)
 
+lb!.selectIndex(0)
+bc! = lb!.getItemAt(0)
+gosub setBC
+
 process_events
-
-resize:
-    ev! = BBjAPI().getLastEvent()
-    h = ev!.getHeight()
-    w = ev!.getWidth()
-    wnd2!.setSize(w,h-50)
-    editor!.getgridex().setSize(w,h-50)
-return
-
-byebye:
-    release
 
 onBCSelect:
     ev! = BBjAPI().getLastEvent()
     bc! = ev!.getSelectedItem()
+    gosub setBC
+return
 
+setBC:
     chdir(bbjHome! + "/barista/")
-        toEval! = "new ::" + bc! + ".bbj::" + bc! + "()"
-        bc! = eval(toEval!)
-        editor!.setBC(bc!)
+    toEval! = "new ::" + bc! + ".bbj::" + bc! + "()"
+    bc! = eval(toEval!)
+    editor!.setBC(bc!)
 return
 
 readfromPath:
@@ -81,6 +80,15 @@ declare BBjVector files!
         value! = value!.replaceAll(".bbj","")
         lb!.addItem(value!)
     next i
-    return
+return
 
+byebye:
+    release
+
+resize:
+    ev! = BBjAPI().getLastEvent()
+    h = ev!.getHeight()
+    w = ev!.getWidth()
+    wnd2!.setSize(w,h-50)
+    editor!.getgridex().setSize(w,h-50)
 return

@@ -15,15 +15,12 @@ endif
 
 s! = File.separator
 
-rem TODO change to .exe under windows
-rem and doesent fully work (the barista.bbj demo)
-
-bbj! = bbjHome! + s! + "bin" + s! + "bbj -q "
+bbj! = "bbj -q "
 config! = "-c" + bbjHome! + s! + "barista" + s! + "sys" + s! + "config" + s! + "enu" + s! + "barista.cfg "  
 workingDir! = "-WD" + bbjHome! + s! + "plugins" + s! + " "
 file! = bbjHome! + s! + "plugins" + s! + "BCMaintenanceWidget" + s! + "lib" + s! + "BaristaDemo.bbj"
 
-scall! = bbj! + config! + workingDir! + file!
+baristaDemo! = bbj! + config! + workingDir! + file!
 
-a! = scall(scall!)
+a! = scall(baristaDemo!)
 release
